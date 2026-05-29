@@ -3,28 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora PA Pediátrica y Flujo de acción </title>
+    <title>Calculadora y Ruta Clínica PA Pediátrica</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@700;900&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --bg-body: #f3f4f6;
-            --bg-card: #ffffff;
-            --border: #d1d5db;
-            --text-main: #111827;
-            --text-muted: #4b5563;
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
+            /* Paleta de Colores Corporativa */
+            --primary: #5E2785;          /* Morado Institucional */
+            --primary-light: #72349e;    /* Morado (Degradado/Hover) */
+            --secondary: #78B833;        /* Verde Lima */
+            --secondary-hover: #67a129;  /* Verde Lima Oscuro */
+            --text-main: #2A2C31;        /* Gris Oscuro / Antracita */
+            --text-muted: #6b7280;
+            --bg-body: #f4f5f8;          /* Fondo base sutil */
+            --bg-card: #FFFFFF;          /* Blanco Puro */
+            --border: #e5e7eb;
             
+            /* Colores Clínicos Estándar (Solo para Diagnósticos) */
             --diag-normal-bg: #dcfce7; --diag-normal-text: #14532d; --diag-normal-border: #22c55e;
             --diag-elevada-bg: #dbeafe; --diag-elevada-text: #1e3a8a; --diag-elevada-border: #3b82f6;
             --diag-etapa1-bg: #ffedd5; --diag-etapa1-text: #7c2d12; --diag-etapa1-border: #f97316;
             --diag-etapa2-bg: #fee2e2; --diag-etapa2-text: #7f1d1d; --diag-etapa2-border: #ef4444;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         
-        body { background-color: var(--bg-body); color: var(--text-main); padding: 1rem; line-height: 1.5; min-height: 100vh; display: flex; flex-direction: column; }
+        body { 
+            background-color: var(--bg-body); 
+            color: var(--text-main); 
+            font-family: 'Inter', sans-serif; /* Tipografía de cuerpo */
+            line-height: 1.5; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+        }
         
-        /* Layout Principal con orden explícito */
+        /* Tipografía Encabezados */
+        h1, h2, h3, h4 { 
+            font-family: 'Poppins', sans-serif; 
+            text-transform: uppercase; 
+            color: var(--primary); 
+        }
+
+        /* Hero Banner / Sección Superior */
+        .hero-banner {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: #FFFFFF;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(94, 39, 133, 0.15);
+            margin-bottom: 2rem;
+        }
+        .hero-banner h1 {
+            color: #FFFFFF;
+            font-weight: 900;
+            font-size: 1.5rem;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+        .hero-banner p {
+            font-weight: 500;
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        /* Layout Principal */
         .dashboard {
             display: flex;
             flex-direction: column; 
@@ -33,115 +79,160 @@
             margin: 0 auto;
             width: 100%;
             flex: 1;
+            padding: 0 1.5rem;
         }
 
         .panel-calculadora { order: 1; }
         .panel-mapa { order: 2; }
 
         @media (min-width: 1024px) {
-            body { padding: 1.5rem; }
             .dashboard { flex-direction: row; align-items: flex-start; justify-content: space-between; }
-            /* Se fuerza calculadora a la izquierda (order 1) y mapa a la derecha (order 2) */
             .panel-calculadora { flex: 0 0 450px; order: 1; }
             .panel-mapa { flex: 1 1 auto; order: 2; position: sticky; top: 1.5rem; max-width: 800px; }
         }
 
-        /* Tarjetas Base */
-        .card { background: var(--bg-card); padding: 1.25rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid var(--border); margin-bottom: 1.5rem; }
-        @media (min-width: 640px) { .card { padding: 1.5rem; } }
-        .card-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; }
-        .card-subtitle { color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.5rem; }
-
-        /* Estilos Calculadora */
-        .form-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+        /* Tarjetas Base (Estructura Limpia) */
+        .card { 
+            background: var(--bg-card); 
+            padding: 1.5rem; 
+            border-radius: 12px; /* Bordes redondeados corporativos */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03); /* Sombra sutil */
+            border: 1px solid rgba(0,0,0,0.05); 
+            margin-bottom: 1.5rem; 
+        }
         
-        .form-group { display: flex; flex-direction: column; align-items: flex-start; width: 100%; gap: 0.25rem; }
-        .main-label { width: 100%; flex-shrink: 0; font-weight: 600; font-size: 0.875rem; }
+        .card-title { 
+            font-size: 1.15rem; 
+            font-weight: 700; 
+            margin-bottom: 0.5rem; 
+            border-bottom: 2px solid var(--border); 
+            padding-bottom: 0.75rem; 
+            letter-spacing: 0.5px;
+        }
+        .card-subtitle { color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.5rem; font-weight: 500; }
+
+        /* Formularios */
+        .form-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
+        
+        .form-group { display: flex; flex-direction: column; align-items: flex-start; width: 100%; gap: 0.35rem; }
+        .main-label { width: 100%; flex-shrink: 0; font-weight: 600; font-size: 0.875rem; color: var(--text-main); }
         
         @media (min-width: 640px) {
             .form-group { flex-direction: row; align-items: center; gap: 0; }
-            .main-label { width: 8rem; }
+            .main-label { width: 8.5rem; }
         }
         
-        .input-group { display: flex; flex: 1; width: 100%; max-width: 100%; background: #ffffff; border: 1px solid var(--border); border-radius: 0.375rem; overflow: hidden; transition: border-color 0.2s, box-shadow 0.2s; }
-        .input-group:focus-within { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(37,99,235,0.2); }
-        .input-group input { flex: 1 1 0%; min-width: 0; border: none; padding: 0.5rem 0.75rem; outline: none; font-size: 1rem; }
-        .input-group .addon { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; background: #f3f4f6; border-left: 1px solid var(--border); padding: 0.5rem 0.75rem; color: var(--text-muted); font-size: 0.875rem; min-width: 4rem; font-weight: 500;}
+        .input-group { 
+            display: flex; flex: 1; width: 100%; max-width: 100%; 
+            background: #ffffff; border: 1px solid var(--border); 
+            border-radius: 8px; overflow: hidden; 
+            transition: border-color 0.2s, box-shadow 0.2s; 
+        }
+        .input-group:focus-within { 
+            border-color: var(--secondary); 
+            box-shadow: 0 0 0 3px rgba(120, 184, 51, 0.15); /* Foco Verde Lima */
+        }
+        .input-group input { 
+            flex: 1 1 0%; min-width: 0; border: none; 
+            padding: 0.625rem 0.75rem; outline: none; 
+            font-size: 1rem; color: var(--text-main); font-family: 'Inter', sans-serif;
+        }
+        .input-group .addon { 
+            flex: 0 0 auto; display: flex; align-items: center; justify-content: center; 
+            background: #f9fafb; border-left: 1px solid var(--border); 
+            padding: 0.625rem 0.75rem; color: var(--text-muted); 
+            font-size: 0.875rem; min-width: 4rem; font-weight: 600;
+        }
         
         .radio-group { display: flex; gap: 1rem; flex: 1; width: 100%; padding-top: 0.25rem; }
         @media (min-width: 640px) { .radio-group { padding-top: 0; } }
         .radio-group label { display: flex; align-items: center; font-size: 0.875rem; cursor: pointer; font-weight: 500; }
-        .radio-group input { margin-right: 0.5rem; cursor: pointer; width: 1rem; height: 1rem; accent-color: var(--primary); }
+        .radio-group input { margin-right: 0.5rem; cursor: pointer; width: 1.1rem; height: 1.1rem; accent-color: var(--primary); }
         
-        .error { background: #fef2f2; border-left: 4px solid var(--diag-etapa2-border); color: var(--diag-etapa2-text); padding: 0.75rem; font-size: 0.875rem; font-weight: 600; margin-top: 1rem; display: none; border-radius: 0.25rem; }
+        .error { background: #fef2f2; border-left: 4px solid var(--diag-etapa2-border); color: var(--diag-etapa2-text); padding: 0.75rem; font-size: 0.875rem; font-weight: 600; margin-top: 1rem; display: none; border-radius: 6px; }
         
-        .buttons { margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.75rem; }
-        button { padding: 0.625rem 1.5rem; border-radius: 0.375rem; font-weight: 600; cursor: pointer; border: none; font-size: 0.875rem; transition: background 0.2s; }
-        .btn-calc { background: var(--primary); color: white; flex: 1; min-width: 200px; }
-        .btn-calc:hover { background: var(--primary-hover); }
+        /* Botones */
+        .buttons { margin-top: 1.75rem; display: flex; flex-wrap: wrap; gap: 0.75rem; }
+        button { 
+            padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; 
+            cursor: pointer; border: none; font-size: 0.875rem; 
+            transition: all 0.2s ease; font-family: 'Inter', sans-serif;
+        }
+        .btn-calc { background: var(--secondary); color: white; flex: 1; min-width: 200px; box-shadow: 0 2px 4px rgba(120, 184, 51, 0.2); }
+        .btn-calc:hover { background: var(--secondary-hover); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(120, 184, 51, 0.3); }
         .btn-reset { background: white; border: 1px solid var(--border); color: var(--text-main); flex: 0 1 auto; }
-        .btn-reset:hover { background: var(--bg-body); }
+        .btn-reset:hover { background: var(--bg-body); border-color: #d1d5db; }
         
         /* Resultados Calculadora */
         #results-section { display: none; animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; border: 1px solid var(--border); border-radius: 0.375rem; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
         th, td { text-align: left; padding: 0.75rem 0.5rem; font-size: 0.875rem; }
-        @media (min-width: 640px) { th, td { padding: 0.75rem 1rem; } }
-        th { background: #e5e7eb; font-weight: 600; color: var(--text-main); }
+        @media (min-width: 640px) { th, td { padding: 0.875rem 1rem; } }
+        th { background: #f9fafb; font-weight: 600; color: var(--text-main); font-family: 'Poppins', sans-serif; font-size: 0.75rem; }
         td { border-bottom: 1px solid var(--border); }
-        tr:nth-child(even) td { background: #f9fafb; }
+        tr:last-child td { border-bottom: none; }
         
-        .diag-box { padding: 1rem; border-radius: 0.375rem; border-left: 6px solid; text-align: center; }
-        .diag-title { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; opacity: 0.8; margin-bottom: 0.25rem; display: block; letter-spacing: 0.05em; }
-        .diag-value { font-size: 1.25rem; font-weight: 900; }
+        .diag-box { padding: 1.25rem; border-radius: 8px; border-left: 6px solid; text-align: center; }
+        .diag-title { font-family: 'Poppins', sans-serif; font-size: 0.75rem; font-weight: 700; opacity: 0.8; margin-bottom: 0.25rem; display: block; letter-spacing: 1px; }
+        .diag-value { font-size: 1.25rem; font-weight: 900; font-family: 'Inter', sans-serif; }
         @media (min-width: 640px) { .diag-value { font-size: 1.5rem; } }
 
-        /* Estilos Dinámicos Diagnóstico */
+        /* Diagnósticos Clínicos Estándar */
         .diag-Normal { background: var(--diag-normal-bg); color: var(--diag-normal-text); border-color: var(--diag-normal-border); }
         .diag-Elevada { background: var(--diag-elevada-bg); color: var(--diag-elevada-text); border-color: var(--diag-elevada-border); }
         .diag-Etapa1 { background: var(--diag-etapa1-bg); color: var(--diag-etapa1-text); border-color: var(--diag-etapa1-border); }
         .diag-Etapa2 { background: var(--diag-etapa2-bg); color: var(--diag-etapa2-text); border-color: var(--diag-etapa2-border); }
 
         /* Flujograma CSS Puro */
-        .flowchart { display: flex; flex-direction: column; align-items: center; gap: 0; font-size: 0.875rem; width: 100%; padding: 1rem 0; }
+        .flowchart { display: flex; flex-direction: column; align-items: center; gap: 0; font-size: 0.875rem; width: 100%; padding: 0.5rem 0; }
         
         .flow-node { 
-            background: #fff; border: 2px solid var(--border); border-radius: 0.5rem; 
-            padding: 1rem; width: 100%; max-width: 400px; text-align: center; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); position: relative; z-index: 2;
+            background: #fff; border: 2px solid var(--border); border-radius: 8px; 
+            padding: 1.25rem; width: 100%; max-width: 400px; text-align: center; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03); position: relative; z-index: 2;
         }
         
-        .flow-node strong { display: block; margin-bottom: 0.25rem; font-size: 0.95rem; }
-        .flow-node ul { text-align: left; margin-top: 0.5rem; padding-left: 1.25rem; font-size: 0.85rem; color: var(--text-muted); }
-        .flow-node li { margin-bottom: 0.25rem; }
+        .flow-node strong { display: block; margin-bottom: 0.25rem; font-size: 0.95rem; color: var(--text-main); }
+        .flow-node ul { text-align: left; margin-top: 0.75rem; padding-left: 1.25rem; font-size: 0.85rem; color: var(--text-muted); }
+        .flow-node li { margin-bottom: 0.35rem; }
         
-        .flow-arrow { width: 3px; height: 24px; background-color: var(--border); position: relative; z-index: 1; margin: -2px 0; }
-        .flow-arrow::after { content: ''; position: absolute; bottom: -6px; left: -5px; border-width: 7px 6px 0; border-style: solid; border-color: var(--border) transparent transparent transparent; }
+        .flow-arrow { width: 2px; height: 24px; background-color: var(--primary); position: relative; z-index: 1; margin: -2px 0; opacity: 0.5; }
+        .flow-arrow::after { content: ''; position: absolute; bottom: -6px; left: -4px; border-width: 6px 5px 0; border-style: solid; border-color: var(--primary) transparent transparent transparent; }
 
         /* Nodos Específicos */
         .node-urgency { border-color: var(--diag-etapa2-border); background: var(--diag-etapa2-bg); color: var(--diag-etapa2-text); font-weight: 600; }
-        .node-action { border-color: #64748b; background: #f8fafc; }
-        .node-aps { border-color: #eab308; background: #fefce8; }
-        .node-nefro { border-color: #000; background: #fffbeb; font-weight: 700; border-width: 3px; }
+        .node-action { border-color: var(--primary-light); background: #faf5ff; }
+        .node-aps { border-color: var(--secondary); background: #f7fee7; }
+        .node-nefro { border-color: var(--primary); background: #ffffff; font-weight: 700; border-width: 3px; }
 
         .initial-state-map { text-align: center; padding: 2rem 0; color: var(--text-muted); }
-        .initial-state-map svg { width: 3rem; height: 3rem; margin-bottom: 1rem; opacity: 0.5; }
+        .initial-state-map svg { width: 3rem; height: 3rem; margin-bottom: 1rem; color: var(--primary); opacity: 0.8; }
         @media (min-width: 640px) { .initial-state-map { padding: 3rem 1rem; } .initial-state-map svg { width: 4rem; height: 4rem; } }
         
         /* Footer */
-        .app-footer { text-align: center; padding: 2rem 1rem; color: var(--text-muted); font-size: 0.875rem; font-weight: 500; border-top: 1px solid var(--border); margin-top: auto; width: 100%; max-width: 1280px; margin-inline: auto; }
+        .app-footer { 
+            text-align: center; padding: 2rem 1.5rem; color: var(--text-muted); 
+            font-size: 0.875rem; font-weight: 500; margin-top: auto; 
+            width: 100%; max-width: 1280px; margin-inline: auto; 
+            font-family: 'Inter', sans-serif;
+        }
     </style>
 </head>
 <body>
+
+<header class="hero-banner">
+    <h1>Calculadora de Presión Arterial</h1>
+    <p>Algoritmo Según Protocolo HTA Infantil Comunal</p>
+</header>
 
 <div class="dashboard">
 
     <main class="panel-calculadora">
         <div class="card">
-            <h2 class="card-title">Calculadora de Presión Arterial</h2>
-            <p class="card-subtitle">Según percentiles MINSAL (1 a 9 años)</p>
+            <h2 class="card-title">Parámetros Clínicos</h2>
+            <p class="card-subtitle">Percentiles estandarizados (1 a 9 años) MINSAL</p>
             
             <form id="bp-form" onsubmit="event.preventDefault(); calculate();">
                 <div class="form-grid">
@@ -189,20 +280,20 @@
                 <div id="error-msg" class="error"></div>
 
                 <div class="buttons">
-                    <button type="submit" class="btn-calc">Calcular</button>
+                    <button type="submit" class="btn-calc">Calcular PA</button>
                     <button type="button" class="btn-reset" onclick="resetForm()">Borrar</button>
                 </div>
             </form>
         </div>
 
         <div class="card" id="results-section">
-            <h3 class="card-title" style="font-size: 1.1rem; margin-bottom: 1rem;">Parámetros del Paciente</h3>
+            <h3 class="card-title" style="margin-bottom: 1rem;">Resultados del Paciente</h3>
             
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 50%;">Variable</th>
-                        <th style="width: 50%;">Clasificación / Rango</th>
+                        <th style="width: 50%;">VARIABLE</th>
+                        <th style="width: 50%;">CLASIFICACIÓN / RANGO</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -234,14 +325,14 @@
 
     <aside class="panel-mapa">
         <div class="card" style="height: 100%;">
-            <h2 class="card-title">Flujograma de Acción</h2>
+            <h2 class="card-title">Ruta Clínica Institucional</h2>
             <p class="card-subtitle">Conducta a seguir en Control de Salud / Morbilidad según resultado</p>
             
             <div id="flowchart-container">
                 <div class="initial-state-map">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                    <p><strong>Ingrese los datos y calcule la PA</strong></p>
-                    <p style="font-size: 0.875rem;">El algoritmo trazará automáticamente la conducta clínica (plazos de confirmación, manejo de APS y criterios de derivación) basado en el protocolo comunal de HTA (El Bosque).</p>
+                    <p><strong style="color: var(--text-main);">Ingrese los datos y calcule la PA</strong></p>
+                    <p style="font-size: 0.875rem;">El algoritmo trazará automáticamente la conducta clínica (plazos de confirmación, manejo de APS y criterios de derivación) basada en normativas vigentes.</p>
                 </div>
             </div>
         </div>
@@ -311,8 +402,8 @@ function resetForm() {
     document.getElementById('flowchart-container').innerHTML = `
         <div class="initial-state-map">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-            <p><strong>Ingrese los datos y calcule la PA</strong></p>
-            <p style="font-size: 0.875rem;">El algoritmo trazará automáticamente la conducta clínica (plazos de confirmación, manejo de APS y criterios de derivación) basada en el Anexo 16/17.</p>
+            <p><strong style="color: var(--text-main);">Ingrese los datos y calcule la PA</strong></p>
+            <p style="font-size: 0.875rem;">El algoritmo trazará automáticamente la conducta clínica (plazos de confirmación, manejo de APS y criterios de derivación) basada en normativas vigentes.</p>
         </div>
     `;
     clearError();
@@ -324,8 +415,8 @@ function renderFlowchart(diagnosis) {
     
     html += `
         <div class="flow-node diag-${diagnosis.cssKey}">
-            <strong>${diagnosis.label}</strong>
-            <span>${diagnosis.pct}</span>
+            <strong>Hallazgo Clínico: ${diagnosis.label}</strong>
+            <span style="font-family: 'Inter', sans-serif;">${diagnosis.pct}</span>
         </div>
     `;
 
@@ -333,18 +424,18 @@ function renderFlowchart(diagnosis) {
         html += `
             <div class="flow-arrow"></div>
             <div class="flow-node node-action">
-                <strong>🥗 Recomendaciones de Estilo de Vida Saludable</strong>
+                <strong>Recomendaciones de Estilo de Vida Saludable</strong>
             </div>
             <div class="flow-arrow"></div>
-            <div class="flow-node" style="border-color: var(--diag-normal-border);">
-                <strong>✅ Continuar controles habituales</strong>
+            <div class="flow-node node-aps">
+                <strong>Continuar controles habituales</strong>
             </div>
         `;
     } else {
         html += `
             <div class="flow-arrow"></div>
             <div class="flow-node node-action">
-                <strong>⏱️ Confirmación por Enfermería < 48 horas</strong>
+                <strong>Confirmación por Enfermería (EU) < 48 horas</strong>
                 <ul>
                     <li>Esperar 3 minutos reposo.</li>
                     <li>Toma de PA en Brazo Derecho.</li>
@@ -359,7 +450,7 @@ function renderFlowchart(diagnosis) {
             </div>
             <div class="flow-arrow"></div>
             <div class="flow-node node-action">
-                <strong>🥗 Iniciar Cambios Estilo de Vida Saludable</strong>
+                <strong>Iniciar Cambios Estilo de Vida Saludable</strong>
                 <ul>
                     <li>Alimentación y Actividad física.</li>
                     <li>Manejo de sobrepeso u obesidad.</li>
@@ -409,7 +500,7 @@ function renderFlowchart(diagnosis) {
                     <span>Si persiste Etapa I en 2° control</span>
                 </div>
                 <div style="margin-top: 1.5rem; width: 100%; max-width: 400px;" class="flow-node node-urgency">
-                    ⚠️ SI SE ENCUENTRA SINTOMÁTICO<br>
+                    SI SE ENCUENTRA SINTOMÁTICO<br>
                     <span style="font-size: 0.8rem; font-weight: 400;">(Cefalea, tinnitus, epistaxis, taquicardia o vómitos)</span><br>
                     <strong>Derivación a médico de turno de urgencia</strong>
                 </div>
@@ -430,7 +521,7 @@ function renderFlowchart(diagnosis) {
                     <span>Si persiste Etapa II en control semanal</span>
                 </div>
                 <div style="margin-top: 1.5rem; width: 100%; max-width: 400px;" class="flow-node node-urgency">
-                    ⚠️ SI SE ENCUENTRA SINTOMÁTICO<br>
+                    SI SE ENCUENTRA SINTOMÁTICO<br>
                     <span style="font-size: 0.8rem; font-weight: 400;">(Cefalea, tinnitus, epistaxis, taquicardia o vómitos)</span><br>
                     <strong>Derivación a médico de turno de urgencia</strong>
                 </div>
@@ -457,7 +548,7 @@ function calculate() {
     }
 
     if (ageNum < 1 || ageNum > 9) {
-        showError('La tabla MINSAL 2021 proporciona datos estandarizados únicamente entre 1 y 9 años de edad.');
+        showError('Datos estandarizados disponibles únicamente entre 1 y 9 años de edad.');
         return;
     }
 
@@ -484,11 +575,11 @@ function calculate() {
         overallDiagnosis = diaResult;
     }
 
-    document.getElementById('out-sys-val').innerText = `PA Sistólica = ${sysNum} mmHg`;
+    document.getElementById('out-sys-val').innerText = `${sysNum} mmHg`;
     document.getElementById('out-sys-lbl').innerText = sysResult.label;
     document.getElementById('out-sys-pct').innerText = sysResult.pct;
 
-    document.getElementById('out-dia-val').innerText = `PA Diastólica = ${diaNum} mmHg`;
+    document.getElementById('out-dia-val').innerText = `${diaNum} mmHg`;
     document.getElementById('out-dia-lbl').innerText = diaResult.label;
     document.getElementById('out-dia-pct').innerText = diaResult.pct;
 
