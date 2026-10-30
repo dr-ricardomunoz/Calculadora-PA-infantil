@@ -232,7 +232,6 @@
     <main class="panel-calculadora">
         <div class="card">
             <h2 class="card-title">Parámetros Clínicos</h2>
-            <p class="card-subtitle">MINSAL 2023 · Tablas 1–12 años y criterios absolutos desde los 13</p>
             
             <form id="bp-form" onsubmit="event.preventDefault(); calculate();">
                 <div class="form-grid">
@@ -260,10 +259,6 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="main-label">Criterio aplicado</label>
-                        <p id="age-rule" class="card-subtitle" style="margin:0">1–12 años: según edad, sexo y talla.</p>
-                    </div>
                     <div class="form-group">
                         <label class="main-label">PA Sistólica</label>
                         <div class="input-group">
@@ -355,7 +350,12 @@
 </div>
 
 <footer class="app-footer">
-    Hecho por Ricardo Muñoz R. · <a href="https://diprece.minsal.cl/wp-content/uploads/2024/05/2024.04.18_HIPERTENSION-ARTERIAL-EN-INFANCIA-Y-ADOLESCENCIA.pdf" target="_blank" rel="noopener noreferrer">OT HTA MINSAL 2023</a> · Protocolo Salud Adolescente El Bosque (2025).
+    <strong>Hecho por Dr. Ricardo Muñoz R.</strong>
+    <div style="margin-top:0.5rem;line-height:1.7">
+        <a href="https://diprece.minsal.cl/wp-content/uploads/2024/05/2024.04.18_HIPERTENSION-ARTERIAL-EN-INFANCIA-Y-ADOLESCENCIA.pdf" target="_blank" rel="noopener noreferrer">Orientación Técnica MINSAL: Pesquisa, diagnóstico y manejo de la hipertensión arterial en la infancia y adolescencia (2023)</a>.<br>
+        Protocolo de Salud del Adolescente y Protocolo de Hipertensión Arterial Infantil, El Bosque (ambos 2025).
+    </div>
+    <div style="margin-top:0.5rem">Contacto: <a href="mailto:drmunozricardo@gmail.com">drmunozricardo@gmail.com</a></div>
 </footer>
 
 <script>
@@ -428,11 +428,6 @@ function updateAgeMode() {
   const older=Number.isInteger(age)&&age>=13&&age<=19;
   document.getElementById('height-group').style.display=older?'none':'';
   document.getElementById('height').required=!older;
-  document.getElementById('age-rule').innerText=older?
-    '13–19 años: límites absolutos; no se requiere talla.':
-    age>=10&&age<=12?
-    '10–12 años: tablas de adolescentes (MINSAL 15–16) por sexo, edad y talla.':
-    '1–9 años: tablas infantiles por sexo, edad y talla.';
 }
 function resetForm() {
   document.getElementById('bp-form').reset();
