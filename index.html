@@ -224,7 +224,7 @@
 
 <header class="hero-banner">
     <h1>Calculadora de Presión Arterial</h1>
-    <p>Algoritmo Según Protocolo HTA Infantil Comunal</p>
+    <p>Ruta clínica de PA · Infancia y adolescencia</p>
 </header>
 
 <div class="dashboard">
@@ -232,7 +232,7 @@
     <main class="panel-calculadora">
         <div class="card">
             <h2 class="card-title">Parámetros Clínicos</h2>
-            <p class="card-subtitle">Percentiles estandarizados (1 a 9 años) MINSAL</p>
+            <p class="card-subtitle">MINSAL 2023 · Tablas 1–12 años y criterios absolutos desde los 13</p>
             
             <form id="bp-form" onsubmit="event.preventDefault(); calculate();">
                 <div class="form-grid">
@@ -247,19 +247,23 @@
                     <div class="form-group">
                         <label class="main-label">Edad</label>
                         <div class="input-group">
-                            <input type="number" id="age" min="1" max="9" placeholder="1 a 9" required>
+                            <input type="number" id="age" min="1" max="19" step="1" placeholder="1 a 19" required>
                             <span class="addon">años</span>
                         </div>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group" id="height-group">
                         <label class="main-label">Talla</label>
                         <div class="input-group">
-                            <input type="number" id="height" step="0.1" required>
+                            <input type="number" id="height" step="0.1" min="45" max="230" required>
                             <span class="addon">cm</span>
                         </div>
                     </div>
 
+                    <div class="form-group">
+                        <label class="main-label">Criterio aplicado</label>
+                        <p id="age-rule" class="card-subtitle" style="margin:0">1–12 años: según edad, sexo y talla.</p>
+                    </div>
                     <div class="form-group">
                         <label class="main-label">PA Sistólica</label>
                         <div class="input-group">
@@ -277,6 +281,13 @@
                     </div>
                 </div>
 
+                <div class="form-group" style="margin:0.6rem 0;">
+                    <label style="display:flex;gap:.6rem;align-items:flex-start;font-size:.85rem;line-height:1.4">
+                        <input id="alarmSymptoms" type="checkbox" style="width:auto;margin-top:.2rem">
+                        Síntomas de alarma / sospecha de daño agudo de órgano blanco
+                    </label>
+                    <p class="card-subtitle" style="margin:.3rem 0 0 1.6rem;">Cefalea intensa, déficit neurológico, alteración visual, convulsiones, dolor torácico o disnea.</p>
+                </div>
                 <div id="error-msg" class="error"></div>
 
                 <div class="buttons">
@@ -306,18 +317,21 @@
                         <td style="font-weight: 600;" id="out-dia-lbl"></td>
                     </tr>
                     <tr>
-                        <td style="color: var(--text-muted);">Pct. Sistólica</td>
+                        <td style="color: var(--text-muted);">Rango de PAS</td>
                         <td style="font-family: monospace;" id="out-sys-pct"></td>
                     </tr>
                     <tr>
-                        <td style="color: var(--text-muted);">Pct. Diastólica</td>
+                        <td style="color: var(--text-muted);">Rango de PAD</td>
                         <td style="font-family: monospace;" id="out-dia-pct"></td>
                     </tr>
+                    <tr><td>Referencia de talla / norma</td><td id="out-reference"></td></tr>
+                    <tr><td>Umbrales PA</td><td id="out-thresholds" style="font-size:.85rem;line-height:1.5"></td></tr>
                 </tbody>
             </table>
+            <p class="card-subtitle" style="margin-top:-.5rem">Se muestran rangos percentilares, no un percentil continuo estimado.</p>
 
             <div id="diag-container" class="diag-box diag-Normal">
-                <span class="diag-title">Diagnóstico</span>
+                <span class="diag-title">Clasificación orientativa</span>
                 <span class="diag-value" id="out-overall-lbl">Normal</span>
             </div>
         </div>
@@ -341,7 +355,7 @@
 </div>
 
 <footer class="app-footer">
-    Hecho por Ricardo Muñoz R.
+    Hecho por Ricardo Muñoz R. · <a href="https://diprece.minsal.cl/wp-content/uploads/2024/05/2024.04.18_HIPERTENSION-ARTERIAL-EN-INFANCIA-Y-ADOLESCENCIA.pdf" target="_blank" rel="noopener noreferrer">OT HTA MINSAL 2023</a> · Protocolo Salud Adolescente El Bosque (2025).
 </footer>
 
 <script>
@@ -356,7 +370,10 @@ const bpData = {
     6: { h: [110.0, 111.8, 114.9, 118.4, 122.1, 125.6, 127.7], sys: [[105, 106, 107, 108, 109, 110, 111], [109, 109, 110, 111, 112, 113, 114], [121, 121, 122, 123, 124, 125, 126]], dia: [[67, 67, 68, 69, 70, 71, 71], [70, 71, 72, 72, 73, 74, 74], [82, 83, 84, 84, 85, 86, 86]] },
     7: { h: [115.9, 117.8, 121.1, 124.9, 128.8, 132.5, 134.7], sys: [[106, 106, 107, 109, 110, 111, 112], [109, 110, 111, 112, 113, 114, 115], [121, 122, 123, 124, 125, 126, 127]], dia: [[68, 68, 70, 69, 71, 72, 72], [72, 72, 73, 73, 74, 74, 75], [84, 84, 85, 85, 86, 86, 87]] },
     8: { h: [121.0, 123.0, 126.5, 130.6, 134.7, 138.5, 140.9], sys: [[107, 107, 108, 110, 111, 112, 113], [110, 111, 112, 113, 115, 116, 117], [122, 123, 124, 125, 127, 128, 129]], dia: [[69, 70, 72, 71, 72, 73, 73], [72, 73, 74, 74, 75, 75, 75], [84, 85, 86, 86, 87, 87, 87]] },
-    9: { h: [125.3, 127.6, 131.3, 135.6, 140.1, 144.1, 146.6], sys: [[108, 108, 109, 111, 112, 113, 114], [112, 112, 113, 114, 116, 117, 118], [124, 124, 125, 126, 128, 129, 130]], dia: [[71, 71, 73, 72, 73, 73, 73], [74, 74, 75, 75, 75, 75, 75], [86, 86, 87, 87, 87, 87, 87]] }
+    9: { h: [125.3, 127.6, 131.3, 135.6, 140.1, 144.1, 146.6], sys: [[108, 108, 109, 111, 112, 113, 114], [112, 112, 113, 114, 116, 117, 118], [124, 124, 125, 126, 128, 129, 130]], dia: [[71, 71, 73, 72, 73, 73, 73], [74, 74, 75, 75, 75, 75, 75], [86, 86, 87, 87, 87, 87, 87]] },
+    10: {h:[129.7,132.2,136.3,141,145.8,150.2,152.8],sys:[[109,110,111,112,113,115,113],[113,114,114,116,117,119,120],[125,126,126,128,129,131,132]],dia:[[72,73,73,73,73,73,73],[75,75,76,76,76,76,76],[87,87,88,88,88,88,88]]},
+    11: {h:[135.6,138.3,142.8,147.8,152.8,157.3,160],sys:[[111,112,113,114,116,118,120],[115,116,117,118,120,123,124],[127,128,129,130,132,135,136]],dia:[[74,74,74,74,74,75,75],[76,77,77,77,77,77,77],[88,89,89,89,89,89,89]]},
+    12: {h:[142.8,145.5,149.9,154.8,159.6,163.8,166.4],sys:[[114,115,116,118,120,122,122],[118,119,120,122,124,125,126],[130,131,132,134,136,137,138]],dia:[[75,75,75,75,76,76,76],[78,78,78,78,79,79,79],[90,90,90,90,91,91,91]]}
   },
   male: {
     1: { h: [77.2, 78.3, 80.2, 82.4, 84.6, 86.7, 87.9], sys: [[98, 99, 99, 100, 100, 101, 101], [102, 102, 103, 103, 104, 105, 105], [114, 114, 115, 115, 116, 117, 117]], dia: [[52, 52, 53, 53, 54, 54, 54], [54, 54, 55, 55, 56, 57, 57], [66, 66, 67, 67, 68, 69, 69]] },
@@ -367,234 +384,160 @@ const bpData = {
     6: { h: [110.3, 112.2, 115.3, 118.9, 122.4, 125.6, 127.5], sys: [[105, 105, 106, 107, 109, 110, 110], [108, 109, 110, 111, 112, 113, 114], [120, 121, 122, 123, 124, 125, 126]], dia: [[66, 66, 67, 68, 68, 69, 69], [69, 70, 70, 71, 72, 72, 73], [81, 82, 82, 84, 84, 85, 85]] },
     7: { h: [116.1, 118.0, 121.4, 125.1, 128.9, 132.4, 134.5], sys: [[106, 107, 108, 109, 110, 111, 111], [110, 110, 111, 112, 114, 115, 116], [122, 122, 123, 124, 126, 127, 128]], dia: [[68, 68, 70, 69, 71, 71, 71], [71, 71, 73, 72, 74, 74, 74], [83, 83, 85, 84, 86, 86, 86]] },
     8: { h: [121.4, 123.5, 127.0, 131.0, 135.1, 138.8, 141.0], sys: [[107, 108, 109, 110, 111, 112, 112], [111, 112, 112, 114, 115, 116, 117], [123, 124, 124, 126, 127, 128, 129]], dia: [[69, 70, 70, 71, 72, 72, 73], [72, 73, 74, 73, 75, 75, 75], [84, 85, 86, 85, 87, 87, 87]] },
-    9: { h: [126.0, 128.3, 132.1, 136.3, 140.7, 144.7, 147.1], sys: [[107, 108, 109, 110, 112, 113, 114], [112, 112, 113, 115, 116, 118, 119], [124, 124, 125, 127, 128, 130, 131]], dia: [[70, 71, 73, 72, 74, 74, 74], [74, 74, 76, 75, 76, 77, 77], [86, 86, 88, 87, 88, 89, 89]] }
+    9: { h: [126.0, 128.3, 132.1, 136.3, 140.7, 144.7, 147.1], sys: [[107, 108, 109, 110, 112, 113, 114], [112, 112, 113, 115, 116, 118, 119], [124, 124, 125, 127, 128, 130, 131]], dia: [[70, 71, 73, 72, 74, 74, 74], [74, 74, 76, 75, 76, 77, 77], [86, 86, 88, 87, 88, 89, 89]] },
+    10: {h:[130.2,132.7,136.7,141.3,145.9,150.1,152.7],sys:[[108,109,111,112,113,115,116],[112,113,114,116,118,120,121],[124,125,126,128,130,132,133]],dia:[[72,73,74,74,75,75,76],[76,76,77,77,78,78,78],[88,88,89,89,90,90,90]]},
+    11: {h:[134.7,137.3,141.5,146.4,151.3,155.8,158.6],sys:[[110,111,112,114,116,117,118],[114,114,116,118,120,123,124],[126,126,128,130,132,135,136]],dia:[[74,74,75,75,75,76,76],[77,78,78,78,78,78,78],[89,90,89,90,90,90,90]]},
+    12: {h:[140.3,143,147.5,152.7,157.9,162.6,165.5],sys:[[113,114,115,117,119,121,122],[116,117,118,121,124,126,128],[128,129,130,133,136,138,140]],dia:[[75,75,75,75,75,76,76],[78,78,78,78,78,79,79],[90,90,90,90,90,91,91]]}
   }
 };
 
-function getClassification(bp, thresholds) {
-    const [p90, p95, p95_12] = thresholds;
-    if (bp < p90) return { label: 'Normal', cssKey: 'Normal', pct: '< p90' };
-    if (bp >= p90 && bp < p95) return { label: 'PA Elevada', cssKey: 'Elevada', pct: '≥ p90 a < p95' };
-    if (bp >= p95 && bp < p95_12) return { label: 'HTA Etapa I', cssKey: 'Etapa1', pct: '≥ p95 hasta < p95+12 mmHg' };
-    return { label: 'HTA Etapa II', cssKey: 'Etapa2', pct: '≥ p95+12 mmHg' };
-}
 
-function getSeverity(cssKey) {
-    const map = { 'Normal': 0, 'Elevada': 1, 'Etapa1': 2, 'Etapa2': 3 };
-    return map[cssKey] || 0;
+function getSeverity(key) { return ({Normal:0,Elevada:1,Etapa1:2,Etapa2:3})[key]??0; }
+function result(level,range) {
+  const b=[['Normal','Normal'],['PA Elevada','Elevada'],['HTA Etapa I','Etapa1'],['HTA Etapa II','Etapa2']][level];
+  return {label:b[0],cssKey:b[1],pct:range};
 }
-
+function getClassification(bp,thresholds,component) {
+  // Tabla 1 MINSAL 2023: aplicar el menor límite entre percentil y valor absoluto.
+  const absolute=component==='sys'?[120,130,140]:[80,80,90];
+  const cuts=thresholds.map((x,i)=>Math.min(x,absolute[i]));
+  if(bp>=cuts[2])return result(3,'≥p95+12 o límite absoluto');
+  if(bp>=cuts[1])return result(2,'≥p95 o límite absoluto');
+  if(bp>=cuts[0])return result(1,'≥p90 o límite absoluto');
+  return result(0,'<p90 y bajo límite absoluto');
+}
+function classify13plus(bp,component) {
+  if(component==='sys') {
+    if(bp>=140)return result(3,'≥140 mmHg');
+    if(bp>=130)return result(2,'130–139 mmHg');
+    if(bp>=120)return result(1,'120–129 mmHg');
+    return result(0,'<120 mmHg');
+  }
+  if(bp>=90)return result(3,'≥90 mmHg');
+  if(bp>=80)return result(2,'80–89 mmHg');
+  return result(0,'<80 mmHg');
+}
 function clearError() {
-    document.getElementById('error-msg').style.display = 'none';
-    document.getElementById('error-msg').innerText = '';
+  const el=document.getElementById('error-msg');el.style.display='none';el.innerText='';
 }
-
 function showError(msg) {
-    const errorEl = document.getElementById('error-msg');
-    errorEl.innerText = msg;
-    errorEl.style.display = 'block';
+  const el=document.getElementById('error-msg');el.innerText=msg;el.style.display='block';
 }
-
+function updateAgeMode() {
+  const age=Number(document.getElementById('age').value);
+  const older=Number.isInteger(age)&&age>=13&&age<=19;
+  document.getElementById('height-group').style.display=older?'none':'';
+  document.getElementById('height').required=!older;
+  document.getElementById('age-rule').innerText=older?
+    '13–19 años: límites absolutos; no se requiere talla.':
+    age>=10&&age<=12?
+    '10–12 años: tablas de adolescentes (MINSAL 15–16) por sexo, edad y talla.':
+    '1–9 años: tablas infantiles por sexo, edad y talla.';
+}
 function resetForm() {
-    document.getElementById('bp-form').reset();
-    document.getElementById('results-section').style.display = 'none';
-    
-    document.getElementById('flowchart-container').innerHTML = `
-        <div class="initial-state-map">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-            <p><strong style="color: var(--text-main);">Ingrese los datos y calcule la PA</strong></p>
-            <p style="font-size: 0.875rem;">El algoritmo trazará automáticamente la conducta clínica (plazos de confirmación, manejo de APS y criterios de derivación) basada en normativas vigentes.</p>
-        </div>
-    `;
-    clearError();
+  document.getElementById('bp-form').reset();
+  document.getElementById('results-section').style.display='none';
+  document.getElementById('flowchart-container').innerHTML=
+    '<div class="initial-state-map"><p><strong>Ingrese los datos y calcule la PA</strong></p><p>La herramienta orienta la confirmación y el manejo posterior.</p></div>';
+  updateAgeMode(); clearError();
 }
-
-function renderFlowchart(diagnosis) {
-    const container = document.getElementById('flowchart-container');
-    let html = '<div class="flowchart">';
-    
-    html += `
-        <div class="flow-node diag-${diagnosis.cssKey}">
-            <strong>Hallazgo Clínico: ${diagnosis.label}</strong>
-            <span style="font-family: 'Inter', sans-serif;">${diagnosis.pct}</span>
-        </div>
-    `;
-
-    if (diagnosis.cssKey === 'Normal') {
-        html += `
-            <div class="flow-arrow"></div>
-            <div class="flow-node node-action">
-                <strong>Recomendaciones de Estilo de Vida Saludable</strong>
-            </div>
-            <div class="flow-arrow"></div>
-            <div class="flow-node node-aps">
-                <strong>Continuar controles habituales</strong>
-            </div>
-        `;
+function renderFlowchart(diagnosis,age,urgent,symptomatic) {
+  const container=document.getElementById('flowchart-container');
+  const arrow='<div class="flow-arrow"></div>';
+  let html='<div class="flowchart"><div class="flow-node diag-'+diagnosis.cssKey+'"><strong>Hallazgo inicial: '+diagnosis.label+'</strong></div>';
+  function node(title,body,cls='node-aps') {
+    return arrow+'<div class="flow-node '+cls+'"><strong>'+title+'</strong>'+
+      (body?'<div style="margin-top:.4rem;font-size:.87rem;line-height:1.5">'+body+'</div>':'')+'</div>';
+  }
+  if(urgent||(symptomatic&&getSeverity(diagnosis.cssKey)>=2)) {
+    html+=node('EVALUACIÓN MÉDICA URGENTE',
+      'PA severamente elevada y/o sospecha de daño agudo de órgano blanco. Evaluación inmediata y derivación a urgencia según red local. No esperar los controles programados.','node-urgency');
+    container.innerHTML=html+'</div>';return;
+  }
+  if(diagnosis.cssKey==='Normal') {
+    html+=node('Continuar controles habituales','Reforzar estilos de vida saludables. Pesquisa de PA al menos anual desde los 3 años.','node-action');
+  } else {
+    if(age>=10) {
+      html+=node('Repetir PA en la MISMA consulta',
+        'Reposo sentado ≥5 min, manguito adecuado y brazo derecho. Realizar dos mediciones adicionales, separadas ≥3 min; promediar las últimas dos. Si se usó equipo oscilométrico y el promedio persiste alterado, confirmar con dos tomas auscultatorias y promediar.','node-action');
     } else {
-        html += `
-            <div class="flow-arrow"></div>
-            <div class="flow-node node-action">
-                <strong>Confirmación por Enfermería (EU) < 48 horas</strong>
-                <ul>
-                    <li>Esperar 3 minutos reposo.</li>
-                    <li>Toma de PA en Brazo Derecho.</li>
-                    <li>Esperar 3 minutos adicionales.</li>
-                    <li>2° Toma de PA en Brazo Derecho.</li>
-                    <li><strong>Promediar ambas tomas y reclasificar.</strong></li>
-                </ul>
-            </div>
-            <div class="flow-arrow"></div>
-            <div class="flow-node diag-${diagnosis.cssKey}">
-                <strong>Si persiste como: ${diagnosis.label} (Asintomático)</strong>
-            </div>
-            <div class="flow-arrow"></div>
-            <div class="flow-node node-action">
-                <strong>Iniciar Cambios Estilo de Vida Saludable</strong>
-                <ul>
-                    <li>Alimentación y Actividad física.</li>
-                    <li>Manejo de sobrepeso u obesidad.</li>
-                    <li>Derivar a nutricionista si procede.</li>
-                </ul>
-            </div>
-        `;
-
-        if (diagnosis.cssKey === 'Elevada') {
-            html += `
-                <div class="flow-arrow"></div>
-                <div class="flow-node node-aps">
-                    <strong>1° Control Médico APS (a los 6 meses)</strong>
-                    <ul>
-                        <li>Medición PA en extremidades superiores y 1 inferior.</li>
-                        <li>Reforzar estilo de vida.</li>
-                    </ul>
-                </div>
-                <div class="flow-arrow"></div>
-                <div class="flow-node node-aps">
-                    <strong>2° Control Médico APS (a los 6 meses)</strong>
-                    <span>Si persiste PA Elevada en 1° control</span>
-                </div>
-                <div class="flow-arrow"></div>
-                <div class="flow-node node-nefro">
-                    <strong>Derivación a Nefrología</strong>
-                    <span>Si persiste PA Elevada en 2° control</span>
-                </div>
-            `;
-        } else if (diagnosis.cssKey === 'Etapa1') {
-            html += `
-                <div class="flow-arrow"></div>
-                <div class="flow-node node-aps">
-                    <strong>1° Control Médico APS (a las 2 semanas)</strong>
-                    <ul>
-                        <li>Medición PA extremidades superiores y 1 inferior.</li>
-                    </ul>
-                </div>
-                <div class="flow-arrow"></div>
-                <div class="flow-node node-aps">
-                    <strong>2° Control Médico APS (a los 3 meses)</strong>
-                    <span>Si persiste Etapa I</span>
-                </div>
-                <div class="flow-arrow"></div>
-                <div class="flow-node node-nefro">
-                    <strong>Derivación a Nefrología</strong>
-                    <span>Si persiste Etapa I en 2° control</span>
-                </div>
-                <div style="margin-top: 1.5rem; width: 100%; max-width: 400px;" class="flow-node node-urgency">
-                    SI SE ENCUENTRA SINTOMÁTICO<br>
-                    <span style="font-size: 0.8rem; font-weight: 400;">(Cefalea, tinnitus, epistaxis, taquicardia o vómitos)</span><br>
-                    <strong>Derivación a médico de turno de urgencia</strong>
-                </div>
-            `;
-        } else if (diagnosis.cssKey === 'Etapa2') {
-            html += `
-                <div class="flow-arrow"></div>
-                <div class="flow-node node-aps">
-                    <strong>Control Médico APS (a la 1 semana)</strong>
-                    <ul>
-                        <li>Medición PA extremidades superiores y 1 inferior.</li>
-                        <li>Verificar control nutricionista.</li>
-                    </ul>
-                </div>
-                <div class="flow-arrow"></div>
-                <div class="flow-node node-nefro">
-                    <strong>Derivación a Nefrología</strong>
-                    <span>Si persiste Etapa II en control semanal</span>
-                </div>
-                <div style="margin-top: 1.5rem; width: 100%; max-width: 400px;" class="flow-node node-urgency">
-                    SI SE ENCUENTRA SINTOMÁTICO<br>
-                    <span style="font-size: 0.8rem; font-weight: 400;">(Cefalea, tinnitus, epistaxis, taquicardia o vómitos)</span><br>
-                    <strong>Derivación a médico de turno de urgencia</strong>
-                </div>
-            `;
-        }
+      html+=node('Confirmación por Enfermería (EU) en menos de 48 h · ruta infantil actual',
+        'Técnica correcta. Realizar dos mediciones separadas por ≥3 min y promediar; reclasificar según resultado.','node-action');
     }
-
-    html += '</div>';
-    container.innerHTML = html;
+    html+=node('Si persiste '+diagnosis.label,
+      'Las indicaciones siguientes son para hallazgo confirmado en paciente asintomático. Si normaliza, volver a controles habituales.','diag-'+diagnosis.cssKey);
+    html+=node('Cambios en estilos de vida',
+      'Actividad física y alimentación. Si existe malnutrición por exceso, derivar a nutricionista sin suspender seguimiento de PA.','node-action');
+    if(diagnosis.cssKey==='Elevada') {
+      html+=node('Control de PA a los 6 meses','Método auscultatorio u oscilométrico validado.');
+      html+=node('Si persiste: PA en ambos brazos y una extremidad inferior','Nuevo control a los 6 meses.');
+      html+=node('Si mantiene PA elevada al año','Derivar a nivel secundario para estudio de HTA secundaria.','node-nefro');
+    } else if(diagnosis.cssKey==='Etapa1') {
+      html+=node('Control de PA en 1–2 semanas','Si persiste, medir ambos brazos y una extremidad inferior.');
+      html+=node('Si persiste etapa I: control en 3 meses','Si normaliza, controles habituales.');
+      html+=node('Si mantiene etapa I','Derivar a nivel secundario para confirmación y estudio.','node-nefro');
+    } else if(diagnosis.cssKey==='Etapa2') {
+      html+=node('Control de PA en 1 semana','Si persiste, medir ambos brazos y una extremidad inferior.');
+      html+=node('Si mantiene etapa II','Derivar a nivel secundario para estudio; síntomas de alarma requieren urgencia.','node-nefro');
+    }
+    html+=node('Alarma clínica: no diferir',
+      'Cefalea intensa, alteración visual o neurológica, convulsiones, dolor torácico o disnea: evaluación médica inmediata.','node-urgency');
+  }
+  container.innerHTML=html+'</div>';
 }
-
 function calculate() {
-    clearError();
-
-    const sex = document.querySelector('input[name="sex"]:checked').value;
-    const ageNum = parseInt(document.getElementById('age').value);
-    const heightNum = parseFloat(document.getElementById('height').value);
-    const sysNum = parseInt(document.getElementById('sysBP').value);
-    const diaNum = parseInt(document.getElementById('diaBP').value);
-
-    if (isNaN(ageNum) || isNaN(heightNum) || isNaN(sysNum) || isNaN(diaNum)) {
-        showError('Por favor complete todos los campos numéricos requeridos.');
-        return;
-    }
-
-    if (ageNum < 1 || ageNum > 9) {
-        showError('Datos estandarizados disponibles únicamente entre 1 y 9 años de edad.');
-        return;
-    }
-
-    const ageData = bpData[sex][ageNum];
-    
-    let closestIndex = 0;
-    let minDiff = Math.abs(ageData.h[0] - heightNum);
-    for (let i = 1; i < ageData.h.length; i++) {
-        const diff = Math.abs(ageData.h[i] - heightNum);
-        if (diff < minDiff) {
-            minDiff = diff;
-            closestIndex = i;
-        }
-    }
-
-    const sysThresholds = [ageData.sys[0][closestIndex], ageData.sys[1][closestIndex], ageData.sys[2][closestIndex]];
-    const diaThresholds = [ageData.dia[0][closestIndex], ageData.dia[1][closestIndex], ageData.dia[2][closestIndex]];
-
-    const sysResult = getClassification(sysNum, sysThresholds);
-    const diaResult = getClassification(diaNum, diaThresholds);
-
-    let overallDiagnosis = sysResult;
-    if (getSeverity(diaResult.cssKey) > getSeverity(sysResult.cssKey)) {
-        overallDiagnosis = diaResult;
-    }
-
-    document.getElementById('out-sys-val').innerText = `${sysNum} mmHg`;
-    document.getElementById('out-sys-lbl').innerText = sysResult.label;
-    document.getElementById('out-sys-pct').innerText = sysResult.pct;
-
-    document.getElementById('out-dia-val').innerText = `${diaNum} mmHg`;
-    document.getElementById('out-dia-lbl').innerText = diaResult.label;
-    document.getElementById('out-dia-pct').innerText = diaResult.pct;
-
-    const diagContainer = document.getElementById('diag-container');
-    diagContainer.className = `diag-box diag-${overallDiagnosis.cssKey}`;
-    document.getElementById('out-overall-lbl').innerText = overallDiagnosis.label;
-
-    document.getElementById('results-section').style.display = 'block';
-
-    renderFlowchart(overallDiagnosis);
+  clearError();
+  const sex=document.querySelector('input[name="sex"]:checked').value;
+  const age=Number(document.getElementById('age').value);
+  const hInput=document.getElementById('height').value;
+  const height=hInput.trim()===''?NaN:Number(hInput);
+  const sys=Number(document.getElementById('sysBP').value);
+  const dia=Number(document.getElementById('diaBP').value);
+  const symptomatic=document.getElementById('alarmSymptoms').checked;
+  if(!Number.isInteger(age)||age<1||age>19)return showError('Edad válida: años cumplidos entre 1 y 19.');
+  if(!Number.isInteger(sys)||!Number.isInteger(dia)||sys<40||sys>260||dia<20||dia>180||dia>=sys)
+    return showError('Revise los valores de PA (mmHg): PAS debe ser mayor que PAD.');
+  if(age<13&&(!Number.isFinite(height)||height<45||height>230))
+    return showError('Ingrese una talla válida para menores de 13 años.');
+  let sr,dr,ref,cuts,urgent=false;
+  if(age>=13) {
+    sr=classify13plus(sys,'sys');dr=classify13plus(dia,'dia');
+    ref='Tabla 1 MINSAL 2023 · puntos de corte absolutos para 13–19 años.';
+    cuts='PA elevada: PAS 120–129 y PAD <80; etapa I: PAS 130–139 o PAD 80–89; etapa II: PAS ≥140 o PAD ≥90.';
+    urgent=sys>=180||dia>=110;
+  } else {
+    const row=bpData[sex][age];
+    let idx=0,diff=Infinity;
+    row.h.forEach((v,i)=>{if(Math.abs(v-height)<diff){idx=i;diff=Math.abs(v-height);}});
+    const st=row.sys.map(a=>a[idx]),dt=row.dia.map(a=>a[idx]);
+    sr=getClassification(sys,st,'sys');dr=getClassification(dia,dt,'dia');
+    const p=[5,10,25,50,75,90,95][idx];
+    const annex=age<=9?(sex==='female'?'Anexo 2':'Anexo 3'):(sex==='female'?'Tabla 15':'Tabla 16');
+    const outside=height<row.h[0]?' · talla menor que tabla':height>row.h[6]?' · talla mayor que tabla':'';
+    ref=annex+' · columna de talla p'+p+' ('+row.h[idx]+' cm)'+outside;
+    const cSys=[Math.min(st[0],120),Math.min(st[1],130),Math.min(st[2],140)];
+    const cDia=[Math.min(dt[0],80),Math.min(dt[1],80),Math.min(dt[2],90)];
+    cuts='Elevada desde '+cSys[0]+'/'+cDia[0]+'; etapa I desde '+cSys[1]+'/'+cDia[1]+
+      '; etapa II desde '+cSys[2]+'/'+cDia[2]+' mmHg (PAS o PAD).';
+    urgent=sys>=st[1]+30||dia>=dt[1]+30;
+  }
+  const diagnosis=getSeverity(dr.cssKey)>getSeverity(sr.cssKey)?dr:sr;
+  document.getElementById('out-sys-val').innerText=sys+' mmHg';
+  document.getElementById('out-dia-val').innerText=dia+' mmHg';
+  document.getElementById('out-sys-lbl').innerText=sr.label;
+  document.getElementById('out-dia-lbl').innerText=dr.label;
+  document.getElementById('out-sys-pct').innerText=sr.pct;
+  document.getElementById('out-dia-pct').innerText=dr.pct;
+  document.getElementById('out-reference').innerText=ref;
+  document.getElementById('out-thresholds').innerText=cuts;
+  document.getElementById('diag-container').className='diag-box diag-'+diagnosis.cssKey;
+  document.getElementById('out-overall-lbl').innerText=diagnosis.label;
+  document.getElementById('results-section').style.display='block';
+  renderFlowchart(diagnosis,age,urgent,symptomatic);
 }
-
-document.querySelectorAll('input').forEach(input => {
-    input.addEventListener('input', clearError);
-});
+document.querySelectorAll('input').forEach(x=>x.addEventListener('input',clearError));
+document.getElementById('age').addEventListener('input',updateAgeMode);
+updateAgeMode();
 </script>
 
 </body>
